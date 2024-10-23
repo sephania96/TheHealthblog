@@ -1,6 +1,10 @@
 from django import forms
 from .models import Comment, Post
+from django.contrib.auth.forms import AuthenticationForm
 
+class CustomLoginForm(AuthenticationForm):
+    username = forms.CharField(label='Username', max_length=150)
+    password = forms.CharField(label='Password', widget=forms.PasswordInput)
 class CommentForm(forms.ModelForm):
     anonymous_name = forms.CharField(required=False, max_length=100, label="Your Name (Optional)")
 
