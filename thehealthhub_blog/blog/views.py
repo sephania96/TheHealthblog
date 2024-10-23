@@ -6,7 +6,33 @@ from django.http import HttpResponseRedirect
 from blog.forms import CommentForm,CustomLoginForm, CustomUserCreationForm, PostForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout
+from .serializers import DoctorSerializer, CategorySerializer, PostSerializer, CommentSerializer
+from rest_framework import viewsets
 # Create your views here.
+
+
+
+
+#im creating my serializer views here
+class DoctorViewSet(viewsets.ModelViewSet):
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorSerializer
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+
+
+
 
 def create_post_view(request):
     if request.method == 'POST':
@@ -101,38 +127,3 @@ def blog_detail(request, pk):
 
 
 
-
-# def create_post(request):
-#     if request.method == 'POST':
-#         form = AnonymousPostForm(request.POST)
-#         if form.is_valid():
-#             post = form.save(commit=False)
-#             post.doctor = None  # No doctor assigned initially
-#             post.save()
-#             form.save_m2m()  # Save the many-to-many relationships (categories)
-#             return redirect('post_detail', slug=post.slug)  # Redirect to the post detail view
-#     else:
-#         form = AnonymousPostForm()
-#     return render(request, 'create_post.html', {'form': form})
-
-# def post_detail(request, post_id):
-#     post = Post.objects.get(id=post_id)
-#     comments = post.comments.all()
-
-#     if request.method == 'POST':
-#         form = CommentForm(request.POST)
-#         if form.is_valid():
-#             anonymous_name = form.cleaned_data.get('anonymous_name')
-#             comment = form.save(user=request.user)  # Pass the current user
-#             if not request.user.is_authenticated and anonymous_name:
-#                 comment.user = None  # Keep as anonymous
-#                 comment.save()  # Save the comment
-#             return redirect('post_detail', post_id=post.id)
-#     else:
-#         form = CommentForm()
-
-#     return render(request, 'post_detail.html', {
-#         'post': post,
-#         'comments': comments,
-#         'form': form,
-#     })
