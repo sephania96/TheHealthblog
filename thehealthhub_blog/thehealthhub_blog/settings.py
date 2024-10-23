@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'autoslug',
     'django_summernote',
     'rest_framework',
+    'django_filters',
 ]
 
 MIDDLEWARE = [

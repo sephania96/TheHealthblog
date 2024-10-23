@@ -9,6 +9,8 @@ from django.contrib.auth import login, logout
 from .serializers import DoctorSerializer, CategorySerializer, PostSerializer, CommentSerializer
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+
 # Create your views here.
 
 
@@ -26,7 +28,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['title', 'categories','doctor']
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
