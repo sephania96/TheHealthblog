@@ -1,6 +1,7 @@
-from django.shortcuts import render, redirect
-from .models import Post
+from django.shortcuts import render, redirect,get_object_or_404
 from .models import Post, Comment
+from django.http import HttpResponseRedirect
+from blog.forms import CommentForm
 # Create your views here.
 # def create_post(request):
 #     if request.method == 'POST':
@@ -55,11 +56,28 @@ def blog_category(request, category):
     return render(request, "blog/category.html", context)
 
 def blog_detail(request, pk):
-    post = Post.objects.get(pk=pk)
+    post = get_object_or_404(Post, pk=pk)  # Using get_object_or_404 for better error handling
     comments = Comment.objects.filter(post=post)
+    form = CommentForm()  # Initialize the comment form
+
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            anonymous_name = form.cleaned_data.get('anonymous_name')
+            comment = form.save(commit=False)  # Don't save yet, we need to set the user
+            if request.user.is_authenticated:
+                comment.user = request.user  # Associate the comment with the user
+            else:
+                comment.user = None  # Keep it as anonymous
+                comment.anonymous_name = anonymous_name  # Optionally save the anonymous name
+            comment.post = post  # Associate comment with the post
+            comment.save()  # Save the comment
+            return redirect('blog_detail', pk=post.pk)  # Redirect to the same post after saving
+
     context = {
         "post": post,
         "comments": comments,
+        "form": form,
     }
 
     return render(request, "blog/detail.html", context)
