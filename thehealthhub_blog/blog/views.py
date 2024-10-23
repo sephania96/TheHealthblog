@@ -2,10 +2,23 @@ from django.shortcuts import render, redirect,get_object_or_404
 from .models import Post, Comment
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseRedirect
-from blog.forms import CommentForm,CustomLoginForm
+from blog.forms import CommentForm,CustomLoginForm, CustomUserCreationForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login
 # Create your views here.
+
+
+def register_view(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('blog_index')  # Redirect to your index page after registration
+    else:
+        form = CustomUserCreationForm()
+    
+    return render(request, 'blog/register.html', {'form': form})
 
 def login_view(request):
     if request.method == 'POST':
