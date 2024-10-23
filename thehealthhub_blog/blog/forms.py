@@ -1,7 +1,20 @@
 from django import forms
-from .models import Comment, Post
+from .models import Comment, Post, Category
 from django.contrib.auth.forms import AuthenticationForm,UserCreationForm
 from django.contrib.auth.models import User
+
+
+class PostForm(forms.ModelForm):
+    categories = forms.ModelMultipleChoiceField(
+        queryset=Category.objects.all(),
+        widget=forms.CheckboxSelectMultiple,  # You can use a select widget if you prefer
+        required=False  # Allow no categories to be selected
+    )
+    class Meta:
+        model = Post
+        fields = ['title', 'content', 'categories']
+
+
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(label='Email Address', required=True)

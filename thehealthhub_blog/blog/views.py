@@ -1,20 +1,35 @@
 from django.shortcuts import render, redirect,get_object_or_404
-from .models import Post, Comment
+from .models import Post, Comment, Doctor
 from django.contrib.auth.forms import AuthenticationForm
+from .models import Category
 from django.http import HttpResponseRedirect
-from blog.forms import CommentForm,CustomLoginForm, CustomUserCreationForm
+from blog.forms import CommentForm,CustomLoginForm, CustomUserCreationForm, PostForm
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 # Create your views here.
+
+def create_post_view(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            if request.user.is_authenticated:
+                post.doctor = Doctor.objects.get(user=request.user)  # Assign the doctor if logged in
+            post.save()
+            form.save_m2m()  # Save the many-to-many relationships
+            return redirect('blog_index')  # Redirect to the index page after creating the post
+    else:
+        form = PostForm()
+
+    return render(request, 'blog/create_post.html', {'form': form})
 
 
 def register_view(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('blog_index')  # Redirect to your index page after registration
+            form.save()
+            return redirect('login_view')  # Redirect to login page after registration
     else:
         form = CustomUserCreationForm()
     
@@ -26,11 +41,15 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('blog_index')  # Redirect to your index page after login
+            return redirect('blog_index')  # Redirect to home page after login
     else:
         form = CustomLoginForm()
     
     return render(request, 'blog/login.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    return redirect('login_view')
 
 
 def blog_index(request):

@@ -7,9 +7,17 @@
 </head>
 <body>
 <h1>My Healthhub Blog</h1>
-<a href="{% url "blog_index" %}">Home</a>
-<a href="{% url 'login_view' %}">Login</a>
-<hr>
+<nav>
+    <a href="{% url 'blog_index' %}">Home</a>
+    {% if user.is_authenticated %}
+        <a href="{% url 'logout_view' %}">Logout</a>
+        <a href="{% url 'create_post_view' %}">Create Post</a>  <!-- Link to create post -->
+    {% else %}
+        <a href="{% url 'login_view' %}">Login</a>
+        <a href="{% url 'create_post_view' %}">Create Post</a>
+        <a href="{% url 'register_view' %}">Register</a>
+    {% endif %}
+</nav>
 {% block page_title %}{% endblock page_title %}
 {% block page_content %}{% endblock page_content %}
 </body>
